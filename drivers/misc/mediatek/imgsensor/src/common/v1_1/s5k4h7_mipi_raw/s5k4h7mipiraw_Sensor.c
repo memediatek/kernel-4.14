@@ -49,7 +49,7 @@
 #define LOG_INF(format, args...) pr_debug(PFX "[%s] " format, __func__, ##args)
 static DEFINE_SPINLOCK(imgsensor_drv_lock);
 #ifndef VENDOR_EDIT
-//#define VENDOR_EDIT
+#define VENDOR_EDIT
 #endif
 
 #include "s5k4h7mipiraw_Sensor.h"
@@ -67,7 +67,7 @@ static DEFINE_SPINLOCK(imgsensor_drv_lock);
 #define DEVICE_VERSION_S5K4H7    "s5k4h7"
 /*Caohua.Lin@Camera.Drv, 20180126 remove register device adapt with mt6771*/
 static kal_uint32 streaming_control(kal_bool enable);
-static uint8_t deviceInfo_register_value;
+/*static uint8_t deviceInfo_register_value;*/
 #endif
 
 static struct imgsensor_info_struct imgsensor_info = {
@@ -212,11 +212,11 @@ static struct SENSOR_WINSIZE_INFO_STRUCT imgsensor_winsize_info[5] = {
 		0000, 0000, 1632, 1224, 0, 0, 1632, 1224},	// Preview
 	{3264, 2448, 0, 0, 3264, 2448, 3264, 2448,
 		0000, 0000, 3264, 2448, 0, 0, 3264, 2448},	// capture
-	{3264, 2448, 0, 0, 3264, 2448, 3264, 1836,
-		0000, 0000, 3264, 1836, 0, 0, 3264, 1836},	// video
-	{3264, 2448, 0, 0, 3264, 2448, 640, 480,
+	{3264, 2448, 0, 0, 3264, 2448, 3264, 2448,
+		0000, 306, 3264, 1836, 0, 0, 3264, 1836},	// video
+	{3264, 2448, 352, 264, 2560, 1920, 640, 480,
 		0000, 0000, 640, 480, 0, 0, 640, 480},	//hight speed video
-	{3264, 2448, 351, 514, 2562, 1440, 1280, 720,
+	{3264, 2448, 352, 514, 2560, 1440, 1280, 720,
 		0000, 0000, 1280, 720, 0, 0, 1280, 720} // slim video
 };
 
@@ -1036,27 +1036,9 @@ static kal_uint32 get_imgsensor_id(UINT32 *sensor_id)
 			read_cmos_sensor_8(0x0000), read_cmos_sensor_8(0x0001),
 			read_cmos_sensor(0x0000));
 		if (*sensor_id == imgsensor_info.sensor_id) {
-#ifdef VENDOR_EDIT
-			/*
-			 * zhengjiang.zhu@Camera.Drv,
-			 * 2017/10/18 add for register device info
-			 */
-			imgsensor_info.module_id = s5k4h7_get_module_id();
-			/*
-			 * Caohua.Lin@Camera.Drv,
-			 * 20180126 remove to adapt with mt6771
-			 */
-			if (deviceInfo_register_value == 0x00) {
-				register_imgsensor_deviceinfo("Cam_f",
-					DEVICE_VERSION_S5K4H7,
-					imgsensor_info.module_id);
-				deviceInfo_register_value = 0x01;
-			}
-#endif
 			LOG_INF(
-				"i2c write id: 0x%x, sensor id: 0x%x module_id 0x%x\n",
-				imgsensor.i2c_write_id, *sensor_id,
-				imgsensor_info.module_id);
+				"i2c write id: 0x%x, sensor id: 0x%x\n",
+				imgsensor.i2c_write_id, *sensor_id);
 			break;
 		}
 		LOG_INF("Read sensor id fail, id: 0x%x,0x%x\n",
@@ -1341,7 +1323,7 @@ static kal_uint32 slim_video(MSDK_SENSOR_EXPOSURE_WINDOW_STRUCT *image_window,
 
 
 static kal_uint32 get_resolution(
-		MSDK_SENSOR_RESOLUTION_INFO_STRUCT * sensor_resolution)
+		MSDK_SENSOR_RESOLUTION_INFO_STRUCT *sensor_resolution)
 {
 	LOG_INF("E\n");
 	sensor_resolution->SensorFullWidth =

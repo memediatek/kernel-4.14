@@ -500,7 +500,7 @@ static int mt6577_auxadc_remove(struct platform_device *pdev)
 }
 
 static const struct dev_pm_ops mt6577_auxadc_pm_ops = {
-	SET_LATE_SYSTEM_SLEEP_PM_OPS(mt6577_auxadc_suspend,
+	SET_NOIRQ_SYSTEM_SLEEP_PM_OPS(mt6577_auxadc_suspend,
 		mt6577_auxadc_resume)
 };
 

@@ -71,15 +71,9 @@ uint64_t sdsp_elf_pa[2] = { 0, 0 };
 #include "mtee_ut/gz_sec_storage_ut.h"
 #endif
 
-#if IS_ENABLED(CONFIG_MTK_ENG_BUILD)
 #define KREE_DEBUG(fmt...) pr_debug("[KREE]" fmt)
 #define KREE_INFO(fmt...) pr_info("[KREE]" fmt)
 #define KREE_ERR(fmt...) pr_info("[KREE][ERR]" fmt)
-#else
-#define KREE_DEBUG(fmt...)
-#define KREE_INFO(fmt...) pr_info("[KREE]" fmt)
-#define KREE_ERR(fmt...) pr_info("[KREE][ERR]" fmt)
-#endif
 
 static const struct file_operations fops = {.owner = THIS_MODULE,
 	.open = gz_dev_open,
@@ -977,7 +971,7 @@ static long _sc_test_cp_chm2shm(struct file *filep, unsigned long arg)
 	/* copy param from user */
 	ret = copy_from_user(&cparam, (void *)arg, sizeof(cparam));
 
-	if (ret < 0) {
+	if (ret) {
 		KREE_ERR("%s: copy_from_user failed(%d)\n", __func__, ret);
 		return ret;
 	}
@@ -1017,7 +1011,7 @@ static long _sc_test_upt_chmdata(struct file *filep, unsigned long arg)
 	/* copy param from user */
 	ret = copy_from_user(&cparam, (void *)arg, sizeof(cparam));
 
-	if (ret < 0) {
+	if (ret) {
 		KREE_ERR("%s: copy_from_user failed(%d)\n", __func__, ret);
 		return ret;
 	}
@@ -1231,7 +1225,7 @@ TZ_RESULT gz_manual_adjust_trusty_wq_attr(char __user *user_req)
 	struct trusty_task_attr manual_task_attr;
 
 	err = copy_from_user(&str, user_req, sizeof(str));
-	if (err < 0) {
+	if (err) {
 		KREE_ERR("[%s]copy_from_user fail(0x%x)\n", __func__,
 			err);
 		return err;
@@ -1282,7 +1276,7 @@ static long _gz_ioctl(struct file *filep, unsigned int cmd, unsigned long arg,
 		KREE_DEBUG("[%s]cmd=MTEE_CMD_SHM_REG(0x%x)\n", __func__, cmd);
 		/* copy param from user */
 		err = copy_from_user(&shm_data, user_req, sizeof(shm_data));
-		if (err < 0) {
+		if (err) {
 			KREE_ERR("[%s]copy_from_user fail(0x%x)\n", __func__,
 				err);
 			return err;
@@ -1306,7 +1300,7 @@ static long _gz_ioctl(struct file *filep, unsigned int cmd, unsigned long arg,
 		/* copy result back to user */
 		shm_data.session = ret;
 		err = copy_to_user(user_req, &shm_data, sizeof(shm_data));
-		if (err < 0) {
+		if (err) {
 			KREE_ERR("[%s]copy_to_user fail(0x%x)\n", __func__,
 				err);
 			return err;
@@ -1358,7 +1352,7 @@ static long _gz_ioctl(struct file *filep, unsigned int cmd, unsigned long arg,
 		KREE_DEBUG("[%s]cmd=MTEE_CMD_SC_CHMEM_HANDLE(0x%x)\n", __func__,
 			cmd);
 		err = copy_from_user(&cparam, user_req, sizeof(cparam));
-		if (err < 0) {
+		if (err) {
 			KREE_ERR("[%s]copy_from_user fail(0x%x)\n", __func__,
 				err);
 			return err;
@@ -1372,7 +1366,7 @@ static long _gz_ioctl(struct file *filep, unsigned int cmd, unsigned long arg,
 			return ret;
 		}
 		err = copy_to_user(user_req, &cparam, sizeof(cparam));
-		if (err < 0) {
+		if (err) {
 			KREE_ERR("[%s]copy_to_user fail(0x%x)\n", __func__,
 				err);
 			return err;
